@@ -9,7 +9,7 @@ TEMPLATE        = subdirs
         } else:wince* {
             SUBDIRS = qtestlib designer
         } else {
-            SUBDIRS = assistant \
+            SUBDIRS = \
                       pixeltool \
                       porting \
                       qtestlib \
