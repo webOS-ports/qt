@@ -3458,6 +3458,7 @@ int QApplication::x11ProcessEvent(XEvent* event)
                 break;
         }
 
+#ifndef QT_NO_CLIPBOARD // for QT_WEBOS
         if (req->selection == ATOM(CLIPBOARD)) {
             if (qt_xfixes_clipboard_changed(req->owner, req->selection_timestamp)) {
                 emit clipboard()->changed(QClipboard::Clipboard);
@@ -3469,6 +3470,7 @@ int QApplication::x11ProcessEvent(XEvent* event)
                 emit clipboard()->selectionChanged();
             }
         }
+#endif // QT_NO_CLIPBOARD // for QT_WEBOS
     }
 #endif // QT_NO_XFIXES
 
@@ -3826,10 +3828,13 @@ int QApplication::x11ProcessEvent(XEvent* event)
         if (ATOM(XdndSelection) && req->selection == ATOM(XdndSelection)) {
             X11->xdndHandleSelectionRequest(req);
 
-        } else if (qt_clipboard) {
+        }
+#ifndef QT_NO_CLIPBOARD // for QT_WEBOS
+		else if (qt_clipboard) {
             QClipboardEvent e(reinterpret_cast<QEventPrivate*>(event));
             QApplication::sendSpontaneousEvent(qt_clipboard, &e);
         }
+#endif // QT_NO_CLIPBOARD // for QT_WEBOS
         break;
     }
     case SelectionClear: {
@@ -3838,10 +3843,12 @@ int QApplication::x11ProcessEvent(XEvent* event)
         if (! req || (ATOM(XdndSelection) && req->selection == ATOM(XdndSelection)))
             break;
 
+#ifndef QT_NO_CLIPBOARD // for QT_WEBOS
         if (qt_clipboard && !X11->use_xfixes) {
             QClipboardEvent e(reinterpret_cast<QEventPrivate*>(event));
             QApplication::sendSpontaneousEvent(qt_clipboard, &e);
         }
+#endif // QT_NO_CLIPBOARD // for QT_WEBOS
         break;
     }
 
@@ -3851,16 +3858,19 @@ int QApplication::x11ProcessEvent(XEvent* event)
         if (! req || (ATOM(XdndSelection) && req->selection == ATOM(XdndSelection)))
             break;
 
+#ifndef QT_NO_CLIPBOARD // for QT_WEBOS
         if (qt_clipboard) {
             QClipboardEvent e(reinterpret_cast<QEventPrivate*>(event));
             QApplication::sendSpontaneousEvent(qt_clipboard, &e);
         }
+#endif // QT_NO_CLIPBOARD // for QT_WEBOS
         break;
     }
     case PropertyNotify:
         // some properties changed
         if (event->xproperty.window == QX11Info::appRootWindow(0)) {
             // root properties for the first screen
+#ifndef QT_NO_CLIPBOARD // for QT_WEBOS
             if (!X11->use_xfixes && event->xproperty.atom == ATOM(_QT_CLIPBOARD_SENTINEL)) {
                 if (qt_check_clipboard_sentinel()) {
                     emit clipboard()->changed(QClipboard::Clipboard);
@@ -3871,7 +3881,9 @@ int QApplication::x11ProcessEvent(XEvent* event)
                     emit clipboard()->changed(QClipboard::Selection);
                     emit clipboard()->selectionChanged();
                 }
-            } else if (QApplicationPrivate::obey_desktop_settings) {
+            } else
+#endif // QT_NO_CLIPBOARD // for QT_WEBOS
+				if (QApplicationPrivate::obey_desktop_settings) {
                 if (event->xproperty.atom == ATOM(RESOURCE_MANAGER))
                     qt_set_x11_resources();
                 else if (event->xproperty.atom == ATOM(_QT_SETTINGS_TIMESTAMP))
@@ -4465,6 +4477,7 @@ bool QETWidget::translateMouseEvent(const XEvent *event)
                               buttons, modifiers);
                 QApplication::sendSpontaneousEvent(this, &e);
 
+#ifndef QT_NO_CONTEXTMENU // for QT_WEBOS
                 if (type == QEvent::MouseButtonPress
                     && button == Qt::RightButton
                     && (openPopupCount == oldOpenPopupCount)) {
@@ -4472,12 +4485,14 @@ bool QETWidget::translateMouseEvent(const XEvent *event)
                                         globalPos, modifiers);
                     QApplication::sendSpontaneousEvent(this, &e);
                 }
+#endif // QT_NO_CONTEXTMENU // for QT_WEBOS
 #endif
             }
             replayPopupMouseEvent = false;
         } else if (type == QEvent::MouseButtonPress
                    && button == Qt::RightButton
                    && (openPopupCount == oldOpenPopupCount)) {
+#ifndef QT_NO_CONTEXTMENU // for QT_WEBOS
             QWidget *popupEvent = popup;
             if (qt_button_down)
                 popupEvent = qt_button_down;
@@ -4485,6 +4500,7 @@ bool QETWidget::translateMouseEvent(const XEvent *event)
                 popupEvent = popupChild;
             QContextMenuEvent e(QContextMenuEvent::Mouse, pos, globalPos, modifiers);
             QApplication::sendSpontaneousEvent(popupEvent, &e);
+#endif // QT_NO_CONTEXTMENU // for QT_WEBOS
         }
 
         if (releaseAfter) {
@@ -4502,15 +4518,73 @@ bool QETWidget::translateMouseEvent(const XEvent *event)
         }
 
         int oldOpenPopupCount = openPopupCount;
+#ifndef QT_WEBOS
         QMouseEvent e(type, pos, globalPos, button, buttons, modifiers);
         QApplicationPrivate::sendMouseEvent(widget, &e, alienWidget, this, &qt_button_down,
                                             qt_last_mouse_receiver);
+#else // QT_WEBOS
+        if ((type == QEvent::MouseButtonPress) ||
+			(type == QEvent::MouseButtonDblClick) ||
+			(type == QEvent::MouseMove)) {
+            QMouseEvent e(type, pos, globalPos, button, buttons, modifiers);
+            QApplicationPrivate::sendMouseEvent(widget, &e, alienWidget, this, &qt_button_down,
+                                                qt_last_mouse_receiver);
+        }
+        
+        QList<QTouchEvent::TouchPoint> touchPoints;
+        QTouchEvent::TouchPoint touchPoint(0);
+        bool recognizedTouchEvent = false;
+        static bool pressed = false;
+
+        switch (type) {
+        case (QEvent::MouseButtonPress): {
+            touchPoint.setState(Qt::TouchPointPressed | Qt::TouchPointPrimary);
+            touchPoint.setPos(pos);
+            touchPoint.setScreenPos(globalPos);
+            pressed = true;
+            recognizedTouchEvent = true;
+            break;
+        }
+        case (QEvent::MouseMove): {
+            if (pressed) {
+                touchPoint.setState(Qt::TouchPointMoved | Qt::TouchPointPrimary);
+                touchPoint.setPos(pos);
+                touchPoint.setScreenPos(globalPos);
+                recognizedTouchEvent = true;
+            }
+            break;
+        }
+        case (QEvent::MouseButtonRelease): {
+            pressed = false;
+            touchPoint.setState(Qt::TouchPointReleased | Qt::TouchPointPrimary);
+            touchPoint.setPos(pos);
+            touchPoint.setScreenPos(globalPos);
+            recognizedTouchEvent = true;
+            break;
+        }
+        default:
+            break;
+        }
+
+        if (recognizedTouchEvent) {
+            touchPoints.append(touchPoint);
+            QApplicationPrivate::translateRawTouchEvent(0, QTouchEvent::TouchScreen, touchPoints);
+        }
+
+        if (type == QEvent::MouseButtonRelease) {
+            QMouseEvent e(type, pos, globalPos, button, buttons, modifiers);
+            QApplicationPrivate::sendMouseEvent(widget, &e, alienWidget, this, &qt_button_down,
+                                                qt_last_mouse_receiver);
+        }       
+#endif // QT_WEBOS
+#ifndef QT_NO_CONTEXTMENU // for QT_WEBOS
         if (type == QEvent::MouseButtonPress
             && button == Qt::RightButton
             && (openPopupCount == oldOpenPopupCount)) {
             QContextMenuEvent e(QContextMenuEvent::Mouse, pos, globalPos, modifiers);
             QApplication::sendSpontaneousEvent(widget, &e);
         }
+#endif // QT_NO_CONTEXTMENU // for QT_WEBOS
     }
     return true;
 }
