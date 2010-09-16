@@ -50,6 +50,8 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
              << "through qmlviewer and are not available in the complied version.\n"
              << "Run 'qmlviewer calculator.qmlproject' or load 'calculator.qmlproject'"
              << "in Qt Creator and run the project.";
+	width: 320; height: 480
+    color: "gray"
 
     QmlApplicationViewer viewer;
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationLockLandscape);

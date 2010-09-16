@@ -1,7 +1,8 @@
 /****************************************************************************
 **
-** Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/
+** Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
+** All rights reserved.
+** Contact: Nokia Corporation (qt-info@nokia.com)
 **
 ** This file is part of the examples of the Qt Toolkit.
 **
@@ -33,31 +34,46 @@
 ** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 ** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
 
-//![0]
-//![3]
 import QtQuick 1.0
-//![3]
 
-//![1]
 Rectangle {
-    id: page
-	width: 320; height: 480
-    color: "lightgray"
-//![1]
+    id: screen
 
-//![2]
-    Text {
-        id: helloText
-        text: "Hello world!"
-        y: 30
-        anchors.horizontalCenter: page.horizontalCenter
-        font.pointSize: 24; font.bold: true
+	width: 320; height: 480
+    color: "black"
+
+    Item {
+        id: container
+        x: screen.width / 2; y: screen.height / 2
+
+        Text {
+            id: text
+            anchors.centerIn: parent
+            color: "white"
+            text: "Hello world!"
+            font.pixelSize: 60
+            smooth: true
+
+            SequentialAnimation on font.letterSpacing {
+                loops: Animation.Infinite;
+		NumberAnimation { from: 0; to: 300; easing.type: Easing.InQuad; duration: 3000 }
+                ScriptAction {
+                    script: {
+                        container.y = (screen.height / 4) + (Math.random() * screen.height / 2)
+                        container.x = (screen.width / 4) + (Math.random() * screen.width / 2)
+                    }
+                }
+            }
+
+            SequentialAnimation on opacity {
+                loops: Animation.Infinite;
+                NumberAnimation { from: 1; to: 0; duration: 2600 }
+                PauseAnimation { duration: 400 }
+            }
+        }
     }
-//![2]
 }
-//![0]
