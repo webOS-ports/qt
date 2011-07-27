@@ -124,7 +124,7 @@ void QPlatformSoftwareCursor::changeCursor(QCursor * widgetCursor, QWidget * wid
     Q_UNUSED(widget);
 #else
     Q_UNUSED(widget);
-    Qt::CursorShape shape = widgetCursor->shape();
+   /* Qt::CursorShape shape = widgetCursor->shape();
 
     if (shape == Qt::BitmapCursor) {
         // application supplied cursor
@@ -138,6 +138,7 @@ void QPlatformSoftwareCursor::changeCursor(QCursor * widgetCursor, QWidget * wid
     QPoint screenOffset = screen->geometry().topLeft(); // global to local translation
     if (onScreen || screen->geometry().intersects(currentRect.translated(screenOffset)))
         setDirty();
+	*/
 #endif
 }
 
