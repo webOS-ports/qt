@@ -106,7 +106,7 @@ extern bool qt_applefontsmoothing_enabled;
 #endif
 
 #if !defined(QT_MAX_CACHED_GLYPH_SIZE)
-#  define QT_MAX_CACHED_GLYPH_SIZE 64
+#  define QT_MAX_CACHED_GLYPH_SIZE 200
 #endif
 
 Q_GUI_EXPORT QImage qt_imageForBrush(int brushStyle, bool invert);
@@ -1908,7 +1908,8 @@ void QGL2PaintEngineExPrivate::drawCachedGlyphs(QFontEngineGlyphCache::Type glyp
             cache->setFilterMode(filterMode);
         }
     }
-=======
+
+#ifdef QT_WEBOS
     GLenum wrapMode = GL_REPEAT;
 #if  defined(QT_OPENGL_ES_2)
     // Standard OpenGL ES 2.0 spec says only supported option for npot textures is CLAMP_TO_EDGE.
