@@ -225,7 +225,9 @@ bool QFontDatabase::removeApplicationFont(int handle)
     db->applicationFonts[handle] = QFontDatabasePrivate::ApplicationFont();
 
     db->reregisterAppFonts = true;
+#ifndef QT_WEBOS
     db->invalidate();
+#endif
     return true;
 }
 
@@ -238,7 +240,9 @@ bool QFontDatabase::removeAllApplicationFonts()
         return false;
 
     db->applicationFonts.clear();
+#ifndef QT_WEBOS
     db->invalidate();
+#endif
     return true;
 }
 
