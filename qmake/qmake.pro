@@ -7,6 +7,7 @@ CONFIG += console bootstrap
 CONFIG -= qt shared app_bundle uic
 DEFINES += QT_BUILD_QMAKE QT_BOOTSTRAPPED
 DESTDIR = ../bin/
+TARGET = qmake2
 
 OBJECTS_DIR = .
 MOC_DIR = .
