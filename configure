@@ -7538,6 +7538,9 @@ elif [ "$XPLATFORM" != "$PLATFORM" ]; then
 else
     COMPILER=`echo $PLATFORM | cut -f 2- -d-`
 fi
+case $COMPILER in
+    *oe-g++) COMPILER="g++" ;;
+esac
 if [ "$CFG_EXCEPTIONS" = "unspecified" -a "$PLATFORM_QWS" = "yes" ]; then
     CFG_EXCEPTIONS=no
 fi
