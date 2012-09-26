@@ -101,7 +101,7 @@ updateqm.name = LRELEASE ${QMAKE_FILE_IN}
 updateqm.CONFIG += no_link
 QMAKE_EXTRA_COMPILERS += updateqm
 
-isEmpty(vcproj) {
+!isEmpty(vcproj) {
     QMAKE_LINK = @: IGNORE THIS LINE
     OBJECTS_DIR =
     win32:CONFIG -= embed_manifest_exe
@@ -111,7 +111,7 @@ isEmpty(vcproj) {
     phony_src.input = PHONY_DEPS
     phony_src.output = phony.c
     phony_src.variable_out = GENERATED_SOURCES
-    phony_src.commands = echo int main() { return 0; } > phony.c
+    phony_src.commands = echo \"int main() { return 0; }\" > phony.c
     phony_src.name = CREATE phony.c
     phony_src.CONFIG += combine
     QMAKE_EXTRA_COMPILERS += phony_src
