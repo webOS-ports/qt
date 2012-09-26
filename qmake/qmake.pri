@@ -22,8 +22,7 @@ SOURCES += project.cpp property.cpp main.cpp generators/makefile.cpp \
            generators/symbian/initprojectdeploy_symbian.cpp \
            generators/integrity/gbuild.cpp \
            windows/registry.cpp \
-           symbian/epocroot.cpp \
-           generators/integrity/gbuild.cpp
+           symbian/epocroot.cpp
 
 HEADERS += project.h property.h generators/makefile.h \
            generators/unix/unixmake.h meta.h option.h cachekeys.h \
@@ -40,8 +39,7 @@ HEADERS += project.h property.h generators/makefile.h \
            generators/symbian/initprojectdeploy_symbian.h \
            generators/integrity/gbuild.h \
            windows/registry_p.h \
-           symbian/epocroot_p.h \
-           generators/integrity/gbuild.h
+           symbian/epocroot_p.h
 
 contains(QT_EDITION, OpenSource) {
    DEFINES += QMAKE_OPENSOURCE_EDITION
@@ -72,6 +70,8 @@ bootstrap { #Qt code
         qlist.cpp \
         qlinkedlist.cpp \
         qlocale.cpp \
+        qlocale_tools.cpp \
+        qlocale_unix.cpp \
         qmalloc.cpp \
         qmap.cpp \
         qmetatype.cpp \
