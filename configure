@@ -694,7 +694,7 @@ fi
 # initalize variables
 #-------------------------------------------------------------------------------
 
-SYSTEM_VARIABLES="RANLIB STRIP OBJDUMP LD CC CXX CFLAGS CXXFLAGS LDFLAGS"
+SYSTEM_VARIABLES="RANLIB STRIP OBJDUMP LD CC CXX CFLAGS CXXFLAGS LDFLAGS LFLAGS"
 for varname in $SYSTEM_VARIABLES; do
     qmakevarname="${varname}"
     # use LDFLAGS for autoconf compat, but qmake uses QMAKE_LFLAGS
