@@ -54,6 +54,7 @@
 QT_BEGIN_NAMESPACE
 extern QString qmake_libraryInfoFile();
 QT_END_NAMESPACE
+#include <stdlib.h>
 #else
 # include "qcoreapplication.h"
 #endif
@@ -112,6 +113,10 @@ QSettings *QLibraryInfoPrivate::findConfiguration()
 #ifdef BOOTSTRAPPING
     if(!QFile::exists(qtconfig))
         qtconfig = qmake_libraryInfoFile();
+    if (!QFile::exists(qtconfig)) {
+        QByteArray config = getenv("QT_CONF_PATH");
+        qtconfig = QFile::decodeName(config);
+    }
 #else
     if (!QFile::exists(qtconfig) && QCoreApplication::instance()) {
 #ifdef Q_OS_MAC
