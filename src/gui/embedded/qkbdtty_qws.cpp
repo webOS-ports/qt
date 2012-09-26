@@ -54,7 +54,19 @@
 
 #if defined Q_OS_LINUX
 #  include <linux/kd.h>
+
+/* Workaround kernel headers using "new" as variable name. The problem
+ is specific to SLED-11, other distros use "newev" rather than "new" */
+#ifdef __cplusplus
+#warning "workaround kernel headers using new as variable name on SLED 11"
+#define new newev
+#endif
+
 #  include <linux/vt.h> //TODO: move vt handling somewhere else (QLinuxFbScreen?)
+
+#ifdef __cplusplus
+#undef new
+#endif
 
 #  include "qscreen_qws.h"
 #  include "qwindowsystem_qws.h"
