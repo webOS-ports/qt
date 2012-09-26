@@ -469,6 +469,58 @@ static void solidFill_gray4(QScreen *screen, const QColor &color,
 }
 #endif // QT_QWS_DEPTH_4
 
+#ifdef QT_QWS_DEPTH_2
+static inline void qt_rectfill_gray2(quint8 *dest, quint8 value,
+                                     int x, int y, int width, int height,
+                                     int stride)
+{
+    const int pixelsPerByte = 4;
+    const int alignWidth = qMin(width, (4 - (x & 3)) & 3);
+    const int doAlign = (alignWidth > 0 ? 1 : 0);
+    const int alignStart = pixelsPerByte - 1 - (x & 3);
+    const int alignStop = alignStart - (alignWidth - 1);
+    const quint8 alignMask = ((1 << (2 * alignWidth)) - 1) << (2 * alignStop);
+    const int tailWidth = (width - alignWidth) & 3;
+    const int doTail = (tailWidth > 0 ? 1 : 0);
+    const quint8 tailMask = (1 << (2 * (pixelsPerByte - tailWidth))) - 1;
+    const int width8 = (width - alignWidth) / pixelsPerByte;
+
+    dest += y * stride + x / pixelsPerByte;
+    stride -= (doAlign + width8);
+
+    for (int j = 0; j < height; ++j) {
+        if (doAlign) {
+            *dest = (*dest & ~alignMask) | (value & alignMask);
+            ++dest;
+        }
+        if (width8) {
+            qt_memfill<quint8>(dest, value, width8);
+            dest += width8;
+        }
+        if (doTail)
+            *dest = (*dest & tailMask) | (value & ~tailMask);
+        dest += stride;
+    }
+}
+
+static void solidFill_gray2(QScreen *screen, const QColor &color,
+                            const QRegion &region)
+{
+    quint8 *dest = reinterpret_cast<quint8*>(screen->base());
+    const quint8 c = qGray(color.rgba()) >> 6;
+    const quint8 c8 = (c << 6) | (c << 4) | (c << 2) | c;
+
+    const int stride = screen->linestep();
+    const QVector<QRect> rects = region.rects();
+
+    for (int i = 0; i < rects.size(); ++i) {
+        const QRect r = rects.at(i);
+        qt_rectfill_gray2(dest, c8, r.x(), r.y(), r.width(), r.height(),
+                          stride);
+    }
+}
+#endif // QT_QWS_DEPTH_2
+
 #ifdef QT_QWS_DEPTH_1
 static inline void qt_rectfill_mono(quint8 *dest, quint8 value,
                                     int x, int y, int width, int height,
@@ -574,6 +626,11 @@ void qt_solidFill_setup(QScreen *screen, const QColor &color,
 #ifdef QT_QWS_DEPTH_4
     case 4:
         screen->d_ptr->solidFill = solidFill_gray4;
+        break;
+#endif
+#ifdef QT_QWS_DEPTH_2
+    case 2:
+        screen->d_ptr->solidFill = solidFill_gray2;
         break;
 #endif
 #ifdef QT_QWS_DEPTH_1
@@ -1006,6 +1063,149 @@ static void blit_4(QScreen *screen, const QImage &image,
 }
 #endif // QT_QWS_DEPTH_4
 
+#ifdef QT_QWS_DEPTH_2
+
+struct qgray2 { quint8 dummy; } Q_PACKED;
+
+template <typename SRC>
+static inline quint8 qt_convertToGray2(SRC color);
+
+template <>
+inline quint8 qt_convertToGray2(quint32 color)
+{
+    return qGray(color) >> 6;
+}
+
+template <>
+inline quint8 qt_convertToGray2(quint16 color)
+{
+    const int r = (color & 0xf800) >> 11;
+    const int g = (color & 0x07e0) >> 6; // only keep 5 bit
+    const int b = (color & 0x001f);
+    return (r * 11 + g * 16 + b * 5) >> 8;
+}
+
+template <>
+inline quint8 qt_convertToGray2(qrgb444 color)
+{
+    return qt_convertToGray2(quint32(color));
+}
+
+template <>
+inline quint8 qt_convertToGray2(qargb4444 color)
+{
+    return qt_convertToGray2(quint32(color));
+}
+
+template <typename SRC>
+static inline void qt_rectconvert_gray2(qgray2 *dest2, const SRC *src,
+                                        int x, int y, int width, int height,
+                                        int dstStride, int srcStride)
+{
+    const int pixelsPerByte = 4;
+    quint8 *dest8 = reinterpret_cast<quint8*>(dest2)
+                    + y * dstStride + x / pixelsPerByte;
+    const int alignWidth = qMin(width, (4 - (x & 3)) & 3);
+    const int doAlign = (alignWidth > 0 ? 1 : 0);
+    const int alignStart = pixelsPerByte - 1 - (x & 3);
+    const int alignStop = alignStart - (alignWidth - 1);
+    const quint8 alignMask = ((1 << (2 * alignWidth)) - 1) << (2 * alignStop);
+    const int tailWidth = (width - alignWidth) & 3;
+    const int doTail = (tailWidth > 0 ? 1 : 0);
+    const quint8 tailMask = (1 << (2 * (pixelsPerByte - tailWidth))) - 1;
+    const int width8 = (width - alignWidth) / pixelsPerByte;
+
+    srcStride = srcStride / sizeof(SRC) - (width8 * pixelsPerByte + alignWidth);
+    dstStride -= (width8 + doAlign);
+
+    for (int j = 0;  j < height; ++j) {
+        if (doAlign) {
+            quint8 d = *dest8 & ~alignMask;
+            for (int i = alignStart; i >= alignStop; --i)
+                d |= qt_convertToGray2<SRC>(*src++) << (2 * i);
+            *dest8++ = d;
+        }
+        for (int i = 0; i < width8; ++i) {
+            *dest8 = (qt_convertToGray2<SRC>(src[0]) << 6)
+                     | (qt_convertToGray2<SRC>(src[1]) << 4)
+                     | (qt_convertToGray2<SRC>(src[2]) << 2)
+                     | (qt_convertToGray2<SRC>(src[3]));
+            src += 4;
+            ++dest8;
+        }
+        if (doTail) {
+            quint8 d = *dest8 & tailMask;
+            switch (tailWidth) {
+            case 3: d |= qt_convertToGray2<SRC>(src[2]) << 2;
+            case 2: d |= qt_convertToGray2<SRC>(src[1]) << 4;
+            case 1: d |= qt_convertToGray2<SRC>(src[0]) << 6;
+            }
+            *dest8 = d;
+        }
+
+        dest8 += dstStride;
+        src += srcStride;
+    }
+}
+
+template <>
+void qt_rectconvert(qgray2 *dest, const quint32 *src,
+                    int x, int y, int width, int height,
+                    int dstStride, int srcStride)
+{
+    qt_rectconvert_gray2<quint32>(dest, src, x, y, width, height,
+                                  dstStride, srcStride);
+}
+
+template <>
+void qt_rectconvert(qgray2 *dest, const quint16 *src,
+                    int x, int y, int width, int height,
+                    int dstStride, int srcStride)
+{
+    qt_rectconvert_gray2<quint16>(dest, src, x, y, width, height,
+                                  dstStride, srcStride);
+}
+
+template <>
+void qt_rectconvert(qgray2 *dest, const qrgb444 *src,
+                    int x, int y, int width, int height,
+                    int dstStride, int srcStride)
+{
+    qt_rectconvert_gray2<qrgb444>(dest, src, x, y, width, height,
+                                  dstStride, srcStride);
+}
+
+template <>
+void qt_rectconvert(qgray2 *dest, const qargb4444 *src,
+                    int x, int y, int width, int height,
+                    int dstStride, int srcStride)
+{
+    qt_rectconvert_gray2<qargb4444>(dest, src, x, y, width, height,
+                                    dstStride, srcStride);
+}
+
+static void blit_2(QScreen *screen, const QImage &image,
+                   const QPoint &topLeft, const QRegion &region)
+{
+    switch (image.format()) {
+    case QImage::Format_ARGB32_Premultiplied:
+        blit_template<qgray2, quint32>(screen, image, topLeft, region);
+        return;
+    case QImage::Format_RGB16:
+        blit_template<qgray2, quint16>(screen, image, topLeft, region);
+        return;
+    case QImage::Format_RGB444:
+        blit_template<qgray2, qrgb444>(screen, image, topLeft, region);
+        return;
+    case QImage::Format_ARGB4444_Premultiplied:
+        blit_template<qgray2, qargb4444>(screen, image, topLeft, region);
+        return;
+    default:
+        qCritical("blit_2(): Image format %d not supported!", image.format());
+    }
+}
+#endif // QT_QWS_DEPTH_2
+
 #ifdef QT_QWS_DEPTH_1
 
 struct qmono { quint8 dummy; } Q_PACKED;
@@ -1257,6 +1457,11 @@ void qt_blit_setup(QScreen *screen, const QImage &image,
 #ifdef QT_QWS_DEPTH_4
     case 4:
         screen->d_ptr->blit = blit_4;
+        break;
+#endif
+#ifdef QT_QWS_DEPTH_2
+    case 2:
+        screen->d_ptr->blit = blit_2;
         break;
 #endif
 #ifdef QT_QWS_DEPTH_1
@@ -2146,6 +2351,8 @@ int QScreen::alloc(unsigned int r,unsigned int g,unsigned int b)
         }
     } else if (d == 4) {
         ret = qGray(r, g, b) >> 4;
+    } else if (d == 2) {
+        ret = qGray(r, g, b) >> 6;
     } else if (d == 1) {
         ret = qGray(r, g, b) >= 128;
     } else {
@@ -2214,6 +2421,10 @@ bool QScreen::supportsDepth(int d) const
         //Just to simplify the ifdeffery
 #ifdef QT_QWS_DEPTH_1
     } else if(d==1) {
+        return true;
+#endif
+#ifdef QT_QWS_DEPTH_2
+    } else if(d==2) {
         return true;
 #endif
 #ifdef QT_QWS_DEPTH_4

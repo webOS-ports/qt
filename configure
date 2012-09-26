@@ -7011,6 +7011,7 @@ if [ "$CFG_QWS_DEPTHS" = "prompted" -a "$PROMPT_FOR_DEPTHS" = "yes" ]; then
     echo "Choose pixel-depths to support:"
     echo
     echo "   1. 1bpp, black/white"
+    echo "   2. 2bpp, grayscale"
     echo "   4. 4bpp, grayscale"
     echo "   8. 8bpp, paletted"
     echo "  12. 12bpp, rgb 4-4-4"
@@ -7029,11 +7030,11 @@ if [ "$CFG_QWS_DEPTHS" = "prompted" -a "$PROMPT_FOR_DEPTHS" = "yes" ]; then
 fi
 if [ -n "$CFG_QWS_DEPTHS" -a "$PLATFORM_QWS" = "yes" ]; then
     if [ "$CFG_QWS_DEPTHS" = "all" ]; then
-        CFG_QWS_DEPTHS="1 4 8 12 15 16 18 24 32 generic"
+        CFG_QWS_DEPTHS="1 2 4 8 12 15 16 18 24 32 generic"
     fi
     for D in `echo "$CFG_QWS_DEPTHS" | sed -e 's/,/ /g'`; do
 	case $D in
-	    1|4|8|12|15|16|18|24|32) QCONFIG_FLAGS="$QCONFIG_FLAGS QT_QWS_DEPTH_$D";;
+	    1|2|4|8|12|15|16|18|24|32) QCONFIG_FLAGS="$QCONFIG_FLAGS QT_QWS_DEPTH_$D";;
 	    generic) QCONFIG_FLAGS="$QCONFIG_FLAGS QT_QWS_DEPTH_GENERIC";;
 	esac
     done

@@ -466,8 +466,8 @@ bool QLinuxFbScreen::connect(const QString &displaySpec)
         setupOffScreen();
 
     // Now read in palette
-    if((vinfo.bits_per_pixel==8) || (vinfo.bits_per_pixel==4)) {
-        screencols= (vinfo.bits_per_pixel==8) ? 256 : 16;
+    if((vinfo.bits_per_pixel==8) || (vinfo.bits_per_pixel==4) || (vinfo.bits_per_pixel==2)) {
+        screencols= 1 << vinfo.bits_per_pixel;
         int loopc;
         ::fb_cmap startcmap;
         startcmap.start=0;
