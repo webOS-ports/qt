@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = rcc-palm
+TARGET = rcc
 
 DESTDIR = ../../../bin
 DEFINES += QT_RCC

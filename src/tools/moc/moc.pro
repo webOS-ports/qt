@@ -1,5 +1,5 @@
 TEMPLATE	= app
-TARGET		= moc-palm
+TARGET		= moc
 
 DEFINES	       += QT_MOC
 DESTDIR         = ../../../bin
