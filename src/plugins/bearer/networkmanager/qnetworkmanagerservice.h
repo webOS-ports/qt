@@ -302,6 +302,9 @@ class QNetworkManagerInterfaceDeviceWireless : public QObject
     
 public:
     
+#ifdef None
+#error qnetworkmanagerservice.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum DeviceCapability {
         None = 0x0,
         Wep40 = 0x1,

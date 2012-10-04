@@ -53,6 +53,10 @@ class SubMarine : public PixmapItem
 {
 Q_OBJECT
 public:
+
+#ifdef None
+#error submarine.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum Movement {
        None = 0,
        Left,

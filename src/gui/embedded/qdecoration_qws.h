@@ -84,6 +84,9 @@ public:
 
     */
 
+#ifdef None
+#error qdecoration_qws.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum DecorationRegion {
         None        = 0x0000000000, All      = 0x7fffffff,
         TopLeft     = 0x0000000001, Top      = 0x0000000002, TopRight    = 0x0000000004,

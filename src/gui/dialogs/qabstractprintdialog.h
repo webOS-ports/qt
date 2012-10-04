@@ -69,6 +69,9 @@ public:
         CurrentPage
     };
 
+#ifdef None
+#error qabstractprintdialog.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum PrintDialogOption {
         None                    = 0x0000, // obsolete
         PrintToFile             = 0x0001,

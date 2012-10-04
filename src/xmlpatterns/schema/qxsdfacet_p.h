@@ -98,6 +98,10 @@ namespace QPatternist
             /**
              * Describes the type of the facet.
              */
+
+#ifdef None
+#error qxsdfacet_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
             enum Type
             {
                 None             = 0,        ///< An invalid facet.

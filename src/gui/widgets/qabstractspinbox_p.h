@@ -78,6 +78,9 @@ enum EmitPolicy {
     NeverEmit
 };
 
+#ifdef None
+#error qabstractspinbox_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
 enum Button {
     None = 0x000,
     Keyboard = 0x001,

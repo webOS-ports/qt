@@ -135,6 +135,10 @@ class Q_GUI_EXPORT QStyleOptionFrameV2 : public QStyleOptionFrame
 {
 public:
     enum StyleOptionVersion { Version = 2 };
+
+#ifdef None
+#error qstyleoption.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum FrameFeature {
         None = 0x00,
         Flat = 0x01
@@ -257,6 +261,10 @@ public:
     enum SectionPosition { Beginning, Middle, End, OnlyOneSection };
     enum SelectedPosition { NotAdjacent, NextIsSelected, PreviousIsSelected,
                             NextAndPreviousAreSelected };
+
+#ifdef None
+#error qstyleoption.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum SortIndicator { None, SortUp, SortDown };
 
     int section;
@@ -282,6 +290,9 @@ public:
     enum StyleOptionType { Type = SO_Button };
     enum StyleOptionVersion { Version = 1 };
 
+#ifdef None
+#error qstyleoption.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum ButtonFeature { None = 0x00, Flat = 0x01, HasMenu = 0x02, DefaultButton = 0x04,
                          AutoDefaultButton = 0x08, CommandLinkButton = 0x10  };
     Q_DECLARE_FLAGS(ButtonFeatures, ButtonFeature)
@@ -372,6 +383,10 @@ public:
     enum StyleOptionType { Type = SO_ToolBar };
     enum StyleOptionVersion { Version = 1 };
     enum ToolBarPosition { Beginning, Middle, End, OnlyOne };
+
+#ifdef None
+#error qstyleoption.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum ToolBarFeature { None = 0x0, Movable = 0x1 };
     Q_DECLARE_FLAGS(ToolBarFeatures, ToolBarFeature)
     ToolBarPosition positionOfLine; // The toolbar line position
@@ -466,6 +481,9 @@ public:
     enum StyleOptionType { Type = SO_Q3ListViewItem };
     enum StyleOptionVersion { Version = 1 };
 
+#ifdef None
+#error qstyleoption.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum Q3ListViewItemFeature { None = 0x00, Expandable = 0x01, MultiLine = 0x02, Visible = 0x04,
                                  ParentControl = 0x08 };
     Q_DECLARE_FLAGS(Q3ListViewItemFeatures, Q3ListViewItemFeature)
@@ -564,6 +582,9 @@ class Q_GUI_EXPORT QStyleOptionViewItemV2 : public QStyleOptionViewItem
 public:
     enum StyleOptionVersion { Version = 2 };
 
+#ifdef None
+#error qstyleoption.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum ViewItemFeature {
         None = 0x00,
         WrapText = 0x01,
@@ -771,6 +792,9 @@ public:
     enum StyleOptionType { Type = SO_ToolButton };
     enum StyleOptionVersion { Version = 1 };
 
+#ifdef None
+#error qstyleoption.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum ToolButtonFeature { None = 0x00, Arrow = 0x01, Menu = 0x04, MenuButtonPopup = Menu, PopupDelay = 0x08,
                              HasMenu = 0x10 };
     Q_DECLARE_FLAGS(ToolButtonFeatures, ToolButtonFeature)

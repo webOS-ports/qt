@@ -62,6 +62,10 @@ class Q_GUI_EXPORT QPageSetupDialog : public QAbstractPageSetupDialog
     Q_PROPERTY(PageSetupDialogOptions options READ options WRITE setOptions)
 
 public:
+
+#ifdef None
+#error qpagesetupdialog.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum PageSetupDialogOption {
         None                    = 0x00000000, // internal
         DontUseSheet            = 0x00000001,

@@ -91,6 +91,9 @@ namespace QPatternist
          *
          * @todo Add docs & links for the enums
          */
+#ifdef None
+#error qschematype_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
         enum TypeCategory
         {
             None = 0,

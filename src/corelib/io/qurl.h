@@ -67,6 +67,10 @@ public:
     };
 
     // encoding / toString values
+
+#ifdef None
+#error qurl.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum FormattingOption {
         None = 0x0,
         RemoveScheme = 0x1,

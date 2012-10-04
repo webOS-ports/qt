@@ -3359,6 +3359,10 @@ void tst_QScriptEngine::automaticSemicolonInsertion()
 class EventReceiver3 : public QObject
 {
 public:
+
+#ifdef None
+#error tst_qscriptengine.cpp must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum AbortionResult {
         None = 0,
         String = 1,

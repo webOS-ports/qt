@@ -180,6 +180,10 @@ namespace QDeclarativeParser
 
         // Script blocks that were nested under this object
         struct ScriptBlock {
+
+#ifdef None
+#error qdeclarativeparser_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
             enum Pragma { 
                 None   = 0x00000000,
                 Shared = 0x00000001

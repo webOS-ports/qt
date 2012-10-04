@@ -1895,6 +1895,10 @@ bool QTextStreamPrivate::getReal(double *f)
         NanInf = 12,
         Done = 13
     };
+
+#ifdef None
+#error qtextstream.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum InputToken {
         None = 0,
         InputSign = 1,

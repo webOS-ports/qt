@@ -65,6 +65,10 @@ class Q_DECLARATIVE_PRIVATE_EXPORT QDeclarativeBasePositioner : public QDeclarat
     Q_PROPERTY(QDeclarativeTransition *move READ move WRITE setMove NOTIFY moveChanged)
     Q_PROPERTY(QDeclarativeTransition *add READ add WRITE setAdd NOTIFY addChanged)
 public:
+
+#ifdef None
+#error qdeclarativepositioners_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum PositionerType { None = 0x0, Horizontal = 0x1, Vertical = 0x2, Both = 0x3 };
     QDeclarativeBasePositioner(PositionerType, QDeclarativeItem *parent);
     ~QDeclarativeBasePositioner();

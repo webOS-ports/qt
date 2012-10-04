@@ -207,6 +207,9 @@ QT_BEGIN_NAMESPACE
 
 QT_MODULE(Core)
 
+#ifdef None
+#error qsimd_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
 enum CPUFeatures {
     None        = 0,
     MMX         = 0x1,

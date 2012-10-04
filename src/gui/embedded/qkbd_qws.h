@@ -66,6 +66,10 @@ public:
     virtual void processKeyEvent(int unicode, int keycode, Qt::KeyboardModifiers modifiers,
                             bool isPress, bool autoRepeat);
 
+
+#ifdef None
+#error qkbd_qws.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum KeycodeAction {
         None               = 0,
 

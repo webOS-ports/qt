@@ -117,6 +117,10 @@ Q_DECLARE_TYPEINFO(glyph_metrics_t, Q_PRIMITIVE_TYPE);
 
 struct Q_AUTOTEST_EXPORT QScriptAnalysis
 {
+
+#ifdef None
+#error qtextengine_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     enum Flags {
         None = 0,
         Lowercase = 1,

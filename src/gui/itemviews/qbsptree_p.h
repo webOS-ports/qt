@@ -62,6 +62,10 @@ class QBspTree
 {
 public:
 
+
+#ifdef None
+#error qbsptree_p.h must be included before any header file that defines None, e.g. X11/X.h
+#endif
     struct Node
     {
         enum Type { None = 0, VerticalPlane = 1, HorizontalPlane = 2, Both = 3 };
