@@ -43,15 +43,15 @@
 #include <QtGui/qpixmap.h>
 #include <QtGui/qwidget.h>
 
-#include "qegl_p.h"
-#include "qeglcontext_p.h"
-
 #if !defined(QT_NO_EGL)
 
 #include <qscreen_qws.h>
 #include <qscreenproxy_qws.h>
 #include <qapplication.h>
 #include <qdesktopwidget.h>
+
+#include "qegl_p.h"
+#include "qeglcontext_p.h"
 
 QT_BEGIN_NAMESPACE
 
