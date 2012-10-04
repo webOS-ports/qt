@@ -38,7 +38,7 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#include <qabstractkineticscroller.h>
+#include "qabstractkineticscroller.h"
 #include "qabstractkineticscroller_p.h"
 
 

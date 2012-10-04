@@ -53,7 +53,7 @@
 #include <QTime>
 #include <QPointer>
 #include <QObject>
-#include <QAbstractKineticScroller>
+#include "qabstractkineticscroller.h"
 #include <QEvent>
 
 QT_BEGIN_NAMESPACE
