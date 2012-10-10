@@ -12177,7 +12177,7 @@ to
 bool QWidgetPrivate::inTabWidget(QWidget *widget)
 {
     for (QWidget *tabWidget = widget; tabWidget; tabWidget = tabWidget->parentWidget())
-        if (qobject_cast<const QTabWidget*>(tabWidget))
+        if (qobject_cast<const QWidget*>(tabWidget))
             return true;
     return false;
 }
