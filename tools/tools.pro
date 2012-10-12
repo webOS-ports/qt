@@ -10,7 +10,6 @@ TEMPLATE        = subdirs
             SUBDIRS = qtestlib designer
         } else {
             SUBDIRS = \
-                      pixeltool \
                       porting \
                       qtestlib \
                       qttracereplay
