@@ -8,15 +8,12 @@ SUBDIRS     = \
             demos_pathstroke \
             demos_affine \
             demos_composition \
-            demos_books \
             demos_interview \
             demos_mainwindow \
             demos_spreadsheet \
             demos_textedit \
-            demos_chip \
             demos_embeddeddialogs \
-            demos_undo \
-            demos_sub-attaq
+            demos_undo
 
 symbian: SUBDIRS = \
             demos_shared \
@@ -55,13 +52,11 @@ wince*|symbian|embedded|x11: SUBDIRS += demos_embedded
 
 !cross_compile:{
 contains(QT_BUILD_PARTS, tools):{
-!wince*:SUBDIRS += demos_sqlbrowser demos_qtdemo
 wince*:SUBDIRS += demos_sqlbrowser
 }
 }
 contains(QT_CONFIG, phonon):!static:SUBDIRS += demos_mediaplayer
 contains(QT_CONFIG, webkit):contains(QT_CONFIG, svg):!symbian:SUBDIRS += demos_browser
-contains(QT_CONFIG, declarative):SUBDIRS += demos_declarative demos_helper
 contains(QT_CONFIG, multimedia):!static:SUBDIRS += demos_spectrum
 
 # install
