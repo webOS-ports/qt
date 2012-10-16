@@ -3541,8 +3541,8 @@ if [ "$CFG_REDUCE_EXPORTS" = "auto" ]; then
     fi
 fi
 
-# auto-detect the availability of the -Bsymbolic-functions linker optimization
-if [ "$CFG_REDUCE_RELOCATIONS" = "auto" ]; then
+# detect the availability of the -Bsymbolic-functions linker optimization
+if [ "$CFG_REDUCE_RELOCATIONS" != "no" ]; then
     if "$unixtests/bsymbolic_functions.test" "$TEST_COMPILER" "$OPT_VERBOSE"; then
         CFG_REDUCE_RELOCATIONS=no
     else
