@@ -15,7 +15,8 @@ HEADERS += hidd_qpa.h \
            NyxInputControl.h \
            nyxkeyboardhandler.h \
            FlickGesture.h \
-           ScreenEdgeFlickGesture.h
+           ScreenEdgeFlickGesture.h \
+           webosDeviceKeymap.h
 
 webos {
     qemu* {
