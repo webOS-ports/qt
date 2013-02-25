@@ -63,6 +63,8 @@ public:
     int depth() const;
     QImage::Format format() const;
 
+    EGLDisplay display() const { return m_dpy; }
+
     QPlatformGLContext *platformContext() const;
 
 private:

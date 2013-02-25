@@ -42,7 +42,7 @@
 
 #include <QtGui/QPlatformIntegrationPlugin>
 #include "qwebosintegration.h"
-
+#include <QDebug>
 QT_BEGIN_NAMESPACE
 
 class QWebOSIntegrationPlugin : public QPlatformIntegrationPlugin
@@ -54,25 +54,16 @@ public:
 
 QStringList QWebOSIntegrationPlugin::keys() const
 {
-    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     QStringList list;
     list << "webos";
-    list << "webos-offscreen";
     return list;
 }
 
 QPlatformIntegration* QWebOSIntegrationPlugin::create(const QString& system, const QStringList& paramList)
 {
-    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
+    qDebug() << __PRETTY_FUNCTION__ << "****" << system << paramList;
     Q_UNUSED(paramList);
-    if (system.toLower() == "webos") {
-        return new QWebOSIntegration(false);
-    }
-    else if(system.toLower() == "webos-offscreen") {
-        return new QWebOSIntegration(true);
-    }
-
-    return 0;
+    return new QWebOSIntegration();
 }
 
 Q_EXPORT_PLUGIN2(webosintegration, QWebOSIntegrationPlugin)

@@ -20,10 +20,10 @@ SOURCES =   main.cpp \
             qwebosscreen.cpp \
             ../eglconvenience/qeglconvenience.cpp \
             ../eglconvenience/qeglplatformcontext.cpp \
-            qwebosfontdatabase.cpp
-#            qeglplatformcontext.cpp \
-#            qweboswindowevents.cpp \
-#            qwebosstyle.cpp
+            qwebosfontdatabase.cpp \
+            qwebosglcontext.cpp \
+            qwebosnativeinterface.cpp \
+            hybriscompositorclient.cpp
 
 HEADERS =   qwebosintegration.h \
             qweboswindow.h \
@@ -32,10 +32,9 @@ HEADERS =   qwebosintegration.h \
             qwebosfontdatabase.h \
             ../eglconvenience/qeglconvenience.h \
             ../eglconvenience/qeglplatformcontext.h \
-#            qeglplatformcontext.h \
-#            qweboswindow_p.h \
-#            qweboswindowevents.h \
-#            qwebosstyle.h
+            qwebosglcontext.h \
+            qwebosnativeinterface.h \
+            hybriscompositorclient.h
 
 # webOS clipboard
 INCLUDEPATH += ../clipboards
@@ -49,11 +48,8 @@ INCLUDEPATH += $$QT_BUILD_TREE/include/QtGui
 INCLUDEPATH += $$QT_BUILD_TREE/include/QtCore
 SOURCES += $$QT_SOURCE_TREE/src/gui/text/qfontengine_ft.cpp
 
-INCLUDEPATH += $$(STAGING_INCDIR)/napp \
-               $$(STAGING_INCDIR)/sysmgr-ipc \
-               $$(STAGING_INCDIR)/ime
-
-#LIBS += -lnapp -lnrwindow
+INCLUDEPATH += $$(STAGING_INCDIR)/ime \
+               $$(STAGING_INCDIR)/sysmgr-ipc
 
 QMAKE_CXXFLAGS += -fno-rtti -fno-exceptions
 

@@ -52,6 +52,8 @@
 #include <QtGui/QPlatformIntegration>
 #include <QtGui/QPlatformScreen>
 
+#include "qeglfsnativeinterface.h"
+
 QT_BEGIN_HEADER
 
 QT_BEGIN_NAMESPACE
@@ -69,11 +71,13 @@ public:
 
     QPlatformFontDatabase *fontDatabase() const;
     virtual QPlatformClipboard *clipboard() const;
+    virtual QPlatformNativeInterface* nativeInterface() const;
 
 private:
     QPlatformFontDatabase *mFontDb;
     QList<QPlatformScreen *> mScreens;
     QEglFSScreen *m_primaryScreen;
+    QEglFSNativeInterface *m_nativeInterface;
 
     QPAHiddTpHandler* m_tpHandler;
     NyxKeyboardHandler* m_keyboard;

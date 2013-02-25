@@ -67,6 +67,7 @@ QEglFSIntegration::QEglFSIntegration(bool soft)
       m_clipboard(new QWebOSClipboard())
 {
     m_primaryScreen = new QEglFSScreen(EGL_DEFAULT_DISPLAY);
+    m_nativeInterface = new QEglFSNativeInterface(m_primaryScreen);
     m_tpHandler = new QPAHiddTpHandler(m_primaryScreen->geometry().width(), m_primaryScreen->geometry().height());
     m_keyboard = new NyxKeyboardHandler;
     this->soft = soft;
@@ -115,6 +116,12 @@ QWindowSurface *QEglFSIntegration::createWindowSurface(QWidget *widget, WId winI
 QPlatformFontDatabase *QEglFSIntegration::fontDatabase() const
 {
     return mFontDb;
+}
+
+QPlatformNativeInterface* QEglFSIntegration::nativeInterface() const
+{
+    qDebug() << __PRETTY_FUNCTION__;
+    return m_nativeInterface;
 }
 
 QT_END_NAMESPACE

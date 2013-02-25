@@ -33,14 +33,16 @@ webos {
                    ../eglconvenience/qeglplatformcontext.cpp \
                    qeglfswindow.cpp \
                    qeglfswindowsurface.cpp \
-                   qeglfsscreen.cpp
+                   qeglfsscreen.cpp \
+                   qeglfsnativeinterface.cpp
 
         HEADERS += qeglfsintegration.h \
                    ../eglconvenience/qeglconvenience.h \
                    ../eglconvenience/qeglplatformcontext.h \
                    qeglfswindow.h \
                    qeglfswindowsurface.h \
-                   qeglfsscreen.h
+                   qeglfsscreen.h \
+                   qeglfsnativeinterface.h
         DEFINES += TARGET_DEVICE
         LIBS_PRIVATE += -lnyx -ldl
     }

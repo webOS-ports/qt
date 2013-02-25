@@ -15,35 +15,18 @@
  *  limitations under the License.
  */
 
-#include "qwebosscreen.h"
-#include "qweboswindow.h"
-#include <QDebug>
-#include <QCoreApplication>
+#include "qwebosnativeinterface.h"
+#include "qwebosglcontext.h"
 
-QT_BEGIN_NAMESPACE
+#include <QtGui/private/qapplication_p.h>
 
-QWebOSScreen::QWebOSScreen()
-    : m_depth(32),
-      m_format(QImage::Format_Invalid),
-      m_direct(false)
+void* QWebOSNativeInterface::nativeResourceForWidget(const QByteArray &resourceString, QWidget *widget)
 {
-    m_geometry = QRect(0, 0, 720, 1224);
-    qWarning() << "using hardcoded screen size in" << __PRETTY_FUNCTION__ << m_geometry;
-}
+    QByteArray lowerCaseResource = resourceString.toLower();
 
-QRect QWebOSScreen::geometry() const
-{
-    return m_geometry;
-}
+    if (lowerCaseResource == "display") {
+        return QWebOSGLContext::display();
+    }
 
-int QWebOSScreen::depth() const
-{
-    return m_depth;
+    return NULL;
 }
-
-QImage::Format QWebOSScreen::format() const
-{
-    return m_format;
-}
-
-QT_END_NAMESPACE
