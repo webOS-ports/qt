@@ -467,7 +467,6 @@ static QFont::Style determineStyleFromTrueTypeSelection(unsigned short fsSelecti
 
 QWebOSFontDatabase::QWebOSFontDatabase() : m_initialized(false), m_debug(false), m_qApp(NULL)
 {
-    qDebug() << __PRETTY_FUNCTION__;
     // These are the defaults that will be used
     setFontConfig(FontConfigSystem, "webos-system-fonts.xml");
     setFontConfig(FontConfigFallback, "webos-fallback-fonts.xml");
@@ -475,7 +474,6 @@ QWebOSFontDatabase::QWebOSFontDatabase() : m_initialized(false), m_debug(false),
 
 void QWebOSFontDatabase::setFontConfig(FontConfig config, const QString& location)
 {
-    qDebug() << __PRETTY_FUNCTION__ << config << location;
     m_fontConfig.insert(config, location);
 }
 
@@ -514,7 +512,6 @@ void QWebOSFontDatabase::populateFontDatabase()
     }
 
     QString systemFontsFileName = resolveFontPathFor(FontConfigSystem);
-    qDebug() << __PRETTY_FUNCTION__ << systemFontsFileName;
     QDomDocument systemDoc("systemFonts");
     QFile systemFontsFile(systemFontsFileName);
 
@@ -561,7 +558,6 @@ void QWebOSFontDatabase::populateFontDatabase()
     QString fallbackFontsFileName = resolveFontPathFor(FontConfigFallback);
     QFile fallbackFontsFile(fallbackFontsFileName);
     if (fallbackFontsFile.exists()) {
-        qDebug() << __PRETTY_FUNCTION__ << fallbackFontsFileName;
         QDomDocument fallbackDoc("fallbackFonts");
 
         if (!fallbackFontsFile.open(QIODevice::ReadOnly)) {
@@ -860,7 +856,7 @@ QStringList QWebOSFontDatabase::addTTFile(QWebOSFontDatabase* qwfdb, const QByte
         fontFile->fileName = file;
         fontFile->indexValue = index;
         fontFile->familyName = allFamilies.at(i);
-        qDebug("registerFont(\"%s\",\"\",%s,%s,%s,true,true,0,\"%s\",fontFile = {fileName = \"%s\", indexValue = %d, familyName = %s})",
+        /*qDebug("registerFont(\"%s\",\"\",%s,%s,%s,true,true,0,\"%s\",fontFile = {fileName = \"%s\", indexValue = %d, familyName = %s})",
                qPrintable(allFamilies.at(i)),
                qPrintable(qWeightToQString(weight)),
                qPrintable(qStyleToQString(style)),
@@ -868,7 +864,7 @@ QStringList QWebOSFontDatabase::addTTFile(QWebOSFontDatabase* qwfdb, const QByte
                qPrintable(qSupportedWritingSystemsToQString(writingSystems)),
                qPrintable(fontFile->fileName),
                fontFile->indexValue,
-               qPrintable(fontFile->familyName));
+               qPrintable(fontFile->familyName));*/
 
         registerFont(allFamilies.at(i), "", weight, style, stretch, true, true, 0, writingSystems, fontFile);
         families.append(family);

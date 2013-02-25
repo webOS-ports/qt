@@ -1,45 +1,39 @@
 
-#ifndef QWEBOSWINDOWSURFACE_H
-#define QWEBOSWINDOWSURFACE_H
+#ifndef QWebOSGLWindowSurface_H
+#define QWebOSGLWindowSurface_H
 
-#include "qwebosintegration.h"
-#include "qweboswindow.h"
-#include "qeglplatformcontext.h"
 
 #include <QtGui/private/qwindowsurface_p.h>
 #include "glib.h"
 
 QT_BEGIN_NAMESPACE
 
-class PIpcChannel;
-struct QWebOSWindowPrivate;
-
-class QWebOSWindowSurface : public QObject,
+class QWebOSWindow;
+class QWebOSGLContext;
+class QWebOSScreen;
+class QWebOSGLWindowSurface : public QObject,
                             public QWindowSurface
 {
     Q_OBJECT
 
 public:
-    QWebOSWindowSurface(QWebOSScreen *screen, QWidget *window, GMainLoop* loop);
-    virtual ~QWebOSWindowSurface();
+    QWebOSGLWindowSurface(QWebOSScreen *screen, QWidget *window, GMainLoop* loop);
+    virtual ~QWebOSGLWindowSurface();
 
     QPaintDevice *paintDevice() { return m_paintDevice; }
     void flush(QWidget *widget, const QRegion &region, const QPoint &offset);
     void resize(const QSize &size);
+    virtual void beginPaint(const QRegion &region);
+    virtual void endPaint(const QRegion &region);
 
 private:
 
     QPaintDevice *m_paintDevice;
-    QWebOSWindowPrivate* m_nrWindow;
     QWebOSScreen* m_screen;
     QTransform m_trans;
-
-private Q_SLOTS:
-    void slotSwapBuffers();
-    void slotInputFocusChanged(bool, QObject*);
-
+    QWebOSGLContext* m_platformGLContext;
 };
 
 QT_END_NAMESPACE
 
-#endif // QWEBOSWINDOWSURFACE_H
+#endif // QWebOSGLWindowSurface_H

@@ -2,23 +2,23 @@
 #ifndef WEBOSINTEGRATION_H
 #define WEBOSINTEGRATION_H
 
-#include "qwebosscreen.h"
 
 #include <QtGui/QPlatformIntegration>
 #include <QtGui/QPlatformScreen>
-#include "qwebosclipboard.h"
 
+#include <glib.h>
 QT_BEGIN_HEADER
 
 QT_BEGIN_NAMESPACE
 
 class QWebOSClipboard;
 class QWebOSFontDatabase;
+class QWebOSScreen;
 
 class QWebOSIntegration : public QPlatformIntegration
 {
 public:
-    QWebOSIntegration(bool offscreen);
+    QWebOSIntegration();
     bool hasCapability(QPlatformIntegration::Capability cap) const;
     QPixmapData *createPixmapData(QPixmapData::PixelType type) const;
     QPlatformWindow *createPlatformWindow(QWidget *widget, WId winId) const;
@@ -34,6 +34,9 @@ private:
     QWebOSScreen *m_primaryScreen;
     bool m_offscreen;
     QWebOSClipboard* m_clipboard;
+    //FIXME right place for those? or put inside screen?
+    GMainContext* m_gContext;
+    GMainLoop* m_gMainLoop;
 };
 
 QT_END_NAMESPACE

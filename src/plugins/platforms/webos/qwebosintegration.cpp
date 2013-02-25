@@ -18,6 +18,8 @@
 
 #include "qweboswindow.h"
 #include "qweboswindowsurface.h"
+#include "qwebosglcontext.h"
+#include "qwebosscreen.h"
 
 #include <QtGui/QPlatformWindow>
 #include "qwebosclipboard.h"
@@ -36,57 +38,57 @@ QPlatformClipboard* QWebOSIntegration::clipboard() const {
     return (QWebOSClipboard*)m_clipboard;
 }
 
-QWebOSIntegration::QWebOSIntegration(bool offscreen)
+QWebOSIntegration::QWebOSIntegration()
     : mFontDb(new QWebOSFontDatabase())
-      ,m_offscreen(offscreen)
+    , m_primaryScreen(0)
 {
-    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
-//QApplication::setStyle(new QWebOSStyle);
+    qDebug()<<__PRETTY_FUNCTION__;
     m_clipboard = new QWebOSClipboard();
-    m_primaryScreen = new QWebOSScreen((EGLNativeDisplayType) 1/*EGL_DEFAULT_DISPLAY*/, offscreen);
-    if(!offscreen) {
-//        m_tpHandler = new QPAHiddTpHandler(m_primaryScreen);
-//        m_kbdHandler = new QPAHiddKbdHandler;
-    }
-    
+
+    m_gContext = g_main_context_default();
+    m_gMainLoop = g_main_loop_new(m_gContext, TRUE); //not running
+    m_primaryScreen = new QWebOSScreen("sysmgr","some qpa app", m_gMainLoop);
+
     mScreens.append(m_primaryScreen);
-#ifdef QEGL_EXTRA_DEBUG
-    qWarning("QEglIntegration\n");
-#endif
+    QWebOSGLContext::initialize(1 /* /dev/fb1 */);
 }
 
 bool QWebOSIntegration::hasCapability(QPlatformIntegration::Capability cap) const
 {
+    qDebug()<<__PRETTY_FUNCTION__;
     switch (cap) {
-    case ThreadedPixmaps: return true;
-    default: return QPlatformIntegration::hasCapability(cap);
+        case ThreadedPixmaps:
+            return true;
+        default:
+            return QPlatformIntegration::hasCapability(cap);
     }
 }
 
 QPixmapData *QWebOSIntegration::createPixmapData(QPixmapData::PixelType type) const
 {
-#ifdef QEGL_EXTRA_DEBUG
-    qWarning("QEglIntegration::createPixmapData %d\n", type);
-#endif
+    qDebug()<<__PRETTY_FUNCTION__;
+    // FIXME right pixmap data? depends on paint engine or window api?
     return new QRasterPixmapData(type);
 }
 
 QPlatformWindow *QWebOSIntegration::createPlatformWindow(QWidget *widget, WId winId) const
 {
-//    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << winId << "****************";
-    Q_UNUSED(winId);
-    return new QWebOSWindow(widget, m_primaryScreen);
+    qDebug()<<__PRETTY_FUNCTION__;
+    Q_UNUSED(winId); //FIXME what is winId - really unused?
+    return new QWebOSWindow(widget, m_primaryScreen); //FIXME should this be differentiated into EGL and non EGL window types
 }
 
 
 QWindowSurface *QWebOSIntegration::createWindowSurface(QWidget *widget, WId winId) const
 {
-//    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
-    Q_UNUSED(winId);
-
-    GMainContext* context = g_main_context_default();
-    GMainLoop* loop = g_main_loop_new(context, TRUE);
-    return new QWebOSWindowSurface(m_primaryScreen, widget, loop);
+    qDebug()<<__PRETTY_FUNCTION__<<winId;
+    Q_UNUSED(winId); //FIXME what is winId - really unused?
+    if(widget->platformWindowFormat().windowApi() == QPlatformWindowFormat::OpenGL)
+        return new QWebOSGLWindowSurface(m_primaryScreen, widget, m_gMainLoop);
+    else {
+        qFatal("non-opengl windowsurface not implemented yet!");
+        return 0; // FIXME software window surface
+    }
 }
 
 QPlatformFontDatabase *QWebOSIntegration::fontDatabase() const

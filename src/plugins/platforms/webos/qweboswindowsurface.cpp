@@ -14,6 +14,9 @@
  *  limitations under the License.
  */
 
+#include "qwebosintegration.h"
+#include "qweboswindow.h"
+#include "qwebosglcontext.h"
 #include "qweboswindowsurface.h"
 
 #include <QtGui/QPlatformGLContext>
@@ -29,99 +32,92 @@ QT_BEGIN_NAMESPACE
 class QWebOSPaintDevice : public QGLPaintDevice
 {
 public:
-    QWebOSPaintDevice(QWebOSScreen *screen, QWidget *widget)
-        :QGLPaintDevice(), m_screen(screen)
+    QWebOSPaintDevice(QWebOSGLContext* platformGLContext)
+        : m_platformGLContext(platformGLContext)
     {
-    #ifdef QEGL_EXTRA_DEBUG
-        qWarning("QEglPaintDevice %p, %p, %p",this, screen, widget);
-    #else
-        Q_UNUSED(widget)
-    #endif
+        qDebug()<<__PRETTY_FUNCTION__;
+        m_context = QGLContext::fromPlatformGLContext(m_platformGLContext);
     }
 
-    QSize size() const { return m_screen->geometry().size(); }
-    QGLContext* context() const { return QGLContext::fromPlatformGLContext(m_screen->platformContext());}
+    QSize size() const {
+        qDebug()<<__PRETTY_FUNCTION__;
+        return m_platformGLContext->surfaceSize();
+    }
+
+    QGLContext* context() const {
+        qDebug()<<__PRETTY_FUNCTION__;
+        return m_context;
+    }
 
     QPaintEngine *paintEngine() const {
+        qDebug()<<__PRETTY_FUNCTION__;
         return qt_qgl_paint_engine();
     }
 
-    void  beginPaint(){
-        QGLPaintDevice::beginPaint();
-    }
 private:
-    QWebOSScreen *m_screen;
+    QWebOSGLContext* m_platformGLContext;
     QGLContext *m_context;
 };
 
 
-//void QWebOSWindowSurface::slotSwapBuffers()
-//{
-//    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
-//    if (m_channel && !(m_screen->isDirectRendering())) {
-//        m_channel->sendAsyncMessage(new ViewHost_UpdateFullWindow(routingId()));
-//    }
-//}
 
-QWebOSWindowSurface::QWebOSWindowSurface(QWebOSScreen *screen, QWidget *window, GMainLoop* loop)
+QWebOSGLWindowSurface::QWebOSGLWindowSurface(QWebOSScreen *screen, QWidget *window, GMainLoop* loop)
     : QWindowSurface(window)
 {
-#ifdef QEGL_EXTRA_DEBUG
-    qWarning("QEglWindowSurface %p, %p", window, screen);
-#endif
-    m_paintDevice = new QWebOSPaintDevice(screen, window);
-    m_screen = screen;
-    //connect((QEGLPlatformContext*)(window->platformWindow()->glContext()), SIGNAL(signalSwapBuffers()), SLOT(slotSwapBuffers()));
+    qDebug()<<__PRETTY_FUNCTION__;
 
-//    QWebOSWindowEvents* filter = new QWebOSWindowEvents;
-//    connect(filter, SIGNAL(signalInputFocusChanged(bool,QObject*)), SLOT(slotInputFocusChanged(bool,QObject*)));
-//    window->installEventFilter(filter);
+    m_platformGLContext = static_cast<QWebOSGLContext*>(window->platformWindow()->glContext());
+    m_paintDevice = new QWebOSPaintDevice(m_platformGLContext);
+    m_screen = screen;
 }
 
-void QWebOSWindowSurface::flush(QWidget *widget, const QRegion &region, const QPoint &offset)
+void QWebOSGLWindowSurface::flush(QWidget *widget, const QRegion &region, const QPoint &offset)
 {
+    qDebug()<<__PRETTY_FUNCTION__;
     Q_UNUSED(region);
     Q_UNUSED(offset);
 
     // QGraphicsView contains a QWidget for its frame, even if it is not visible. Any repaint
     // on that frame widget will cause an extra buffer swap, causing problems. This filters out
     // that swap.
-    if(qobject_cast<QGraphicsView*>(widget))
-        return;
+//    if(qobject_cast<QGraphicsView*>(widget))
+//        return;
     widget->platformWindow()->glContext()->swapBuffers();
 }
 
-//void QWebOSWindowSurface::slotInputFocusChanged(bool focus, QObject* obj)
-//{
-//    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
 
-//    if (m_channel) {
-//        PalmIME::EditorState state;
-//        if(QWidget* widget = qobject_cast<QWidget*>(obj))
-//        {
-//            Qt::InputMethodHints hints = widget->inputMethodHints();
-//            if((hints & Qt::ImhUrlCharactersOnly) == Qt::ImhUrlCharactersOnly)
-//                state = PalmIME::EditorState(PalmIME::FieldType_URL);
-//            else if((hints & Qt::ImhEmailCharactersOnly) == Qt::ImhEmailCharactersOnly)
-//                state = PalmIME::EditorState(PalmIME::FieldType_Email);
-//            else if((hints & Qt::ImhDialableCharactersOnly) == Qt::ImhDialableCharactersOnly)
-//                state = PalmIME::EditorState(PalmIME::FieldType_Phone);
-//        }
-//        m_channel->sendAsyncMessage(new ViewHost_EditorFocusChanged(routingId(), focus, state));
-//    }
-//}
-
-QWebOSWindowSurface::~QWebOSWindowSurface()
+QWebOSGLWindowSurface::~QWebOSGLWindowSurface()
 {
 }
 
-void QWebOSWindowSurface::resize(const QSize &size)
+void QWebOSGLWindowSurface::resize(const QSize &size)
 {
+    qDebug()<<__PRETTY_FUNCTION__<<size;
     Q_UNUSED(size);
+}
+void QWebOSGLWindowSurface::beginPaint(const QRegion &region)
+{
+    qDebug()<<__PRETTY_FUNCTION__;
+    Q_UNUSED(region);
+}
+
+void QWebOSGLWindowSurface::endPaint(const QRegion &region)
+{
+    qDebug()<<__PRETTY_FUNCTION__;
+    Q_UNUSED(region);
 }
 
 #if 0
-int QWebOSWindowSurface::routingId() const
+
+void QWebOSGLWindowSurface::slotSwapBuffers()
+{
+    qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
+    if (m_channel && !(m_screen->isDirectRendering())) {
+        m_channel->sendAsyncMessage(new ViewHost_UpdateFullWindow(routingId()));
+    }
+}
+
+int QWebOSGLWindowSurface::routingId() const
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     if (m_nrWindow)
@@ -129,14 +125,14 @@ int QWebOSWindowSurface::routingId() const
     return 0;
 }
 
-void QWebOSWindowSurface::onDisconnected()
+void QWebOSGLWindowSurface::onDisconnected()
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     qWarning("%s", __PRETTY_FUNCTION__);
     exit(-1);
 }
 
-void QWebOSWindowSurface::serverConnected(PIpcChannel* channel)
+void QWebOSGLWindowSurface::serverConnected(PIpcChannel* channel)
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     channel->setListener(this);
@@ -162,7 +158,7 @@ void QWebOSWindowSurface::serverConnected(PIpcChannel* channel)
     m_channel->sendAsyncMessage(new ViewHost_AddWindow(routingId()));
 }
 
-void QWebOSWindowSurface::serverDisconnected()
+void QWebOSGLWindowSurface::serverDisconnected()
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     qWarning("%s", __PRETTY_FUNCTION__);
@@ -171,11 +167,11 @@ void QWebOSWindowSurface::serverDisconnected()
 
 
 //Message handling
-void QWebOSWindowSurface::onMessageReceived(const PIpcMessage& msg)
+void QWebOSGLWindowSurface::onMessageReceived(const PIpcMessage& msg)
 {
     bool msgIsOk;
 
-    IPC_BEGIN_MESSAGE_MAP(QWebOSWindowSurface, msg, msgIsOk)
+    IPC_BEGIN_MESSAGE_MAP(QWebOSGLWindowSurface, msg, msgIsOk)
         IPC_MESSAGE_HANDLER(View_InputEvent, onInputEvent)
         IPC_MESSAGE_HANDLER(View_KeyEvent, onKeyEvent)
         IPC_MESSAGE_HANDLER(View_TouchEvent, onTouchEvent)
@@ -186,7 +182,7 @@ void QWebOSWindowSurface::onMessageReceived(const PIpcMessage& msg)
     IPC_END_MESSAGE_MAP()
 }
 
-void QWebOSWindowSurface::onCommitText(std::string s)
+void QWebOSGLWindowSurface::onCommitText(std::string s)
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     QWidget* focus = QApplication::focusWidget();
@@ -201,20 +197,20 @@ void QWebOSWindowSurface::onCommitText(std::string s)
     }
 }
 
-void QWebOSWindowSurface::onRemoveInputFocus()
+void QWebOSGLWindowSurface::onRemoveInputFocus()
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     qApp->postEvent(window(), new QEvent(QEvent::CloseSoftwareInputPanel));
 }
 
-void QWebOSWindowSurface::onFullScreenEnabled()
+void QWebOSGLWindowSurface::onFullScreenEnabled()
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     qWarning("Full screen enabled");
     m_screen->directRendering(true);
     window()->update();
 }
-void QWebOSWindowSurface::onFullScreenDisabled()
+void QWebOSGLWindowSurface::onFullScreenDisabled()
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     qWarning("Full screen disabled");
@@ -222,14 +218,14 @@ void QWebOSWindowSurface::onFullScreenDisabled()
     window()->update();
 }
 
-void QWebOSWindowSurface::onKeyEvent(const SysMgrKeyEvent& e)
+void QWebOSGLWindowSurface::onKeyEvent(const SysMgrKeyEvent& e)
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     QKeyEvent key = e.qtEvent();
     QWindowSystemInterface::handleKeyEvent(window(), key.type(), key.key(), key.modifiers(), key.text());
 }
 
-void QWebOSWindowSurface::onTouchEvent(const SysMgrTouchEvent& te)
+void QWebOSGLWindowSurface::onTouchEvent(const SysMgrTouchEvent& te)
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     QList<QWindowSystemInterface::TouchPoint> touchPoints;
@@ -257,7 +253,7 @@ void QWebOSWindowSurface::onTouchEvent(const SysMgrTouchEvent& te)
     QWindowSystemInterface::handleTouchEvent(window(), static_cast<QEvent::Type>(te.type), QTouchEvent::TouchScreen, touchPoints);
 }
 
-void QWebOSWindowSurface::onInputEvent(const SysMgrEventWrapper& wrapper) 
+void QWebOSGLWindowSurface::onInputEvent(const SysMgrEventWrapper& wrapper) 
 {
     qDebug() << "\t\t\t\t\**************"<< __PRETTY_FUNCTION__ << "****************";
     SysMgrEvent* e = wrapper.event;
